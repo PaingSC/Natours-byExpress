@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/PaingSC/Natours-byExpress/issues"
   },
-  "homepage": "https://github.com/PaingSC/Natours-byExpress#readme"
+  "homepage": "https://github.com/PaingSC/Natours-byExpress#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
