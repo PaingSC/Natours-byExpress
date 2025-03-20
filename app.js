@@ -31,6 +31,7 @@ app.get('/api/v1/tours', (req, res) => {
   });
 });
 
+// Responding to Url parameters(/:variables)
 app.get('/api/v1/tours/:id', (req, res) => {
   const tourId = req.params.id * 1; // Making it into a number
   const tour = tours.find((tour) => tour.id === tourId);
@@ -46,8 +47,23 @@ app.get('/api/v1/tours/:id', (req, res) => {
   console.log(tour);
   res.status(200).json({
     status: 'success',
-    // results: tours.length,
     tour,
+  });
+});
+
+// Handling patch requests
+app.patch('/api/v1/tours/:id', (req, res) => {
+  if (req.params.id * 1 > tours.length)
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID',
+    });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      tour: '<Updated tour here..>',
+    },
   });
 });
 
