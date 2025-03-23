@@ -8,6 +8,12 @@ const app = express();
 // middleware
 app.use(express.json());
 
+// Own middleware
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 👋');
+  next();
+});
+
 // I. Basic routing with 'express'
 // app.get('/', (req, res) => {
 //   res
