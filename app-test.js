@@ -11,7 +11,7 @@ app.use(express.json());
 // Own middleware
 app.use((req, res, next) => {
   console.log('Hello from the middleware 👋');
-  next();
+  // next();
 });
 
 // I. Basic routing with 'express'
