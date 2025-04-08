@@ -11,21 +11,16 @@ const DB = process.env.DATABASE.replace(
 );
 
 mongoose
-  .connect(DB, {
-    // .connect(process.env.DATABASE_LOCAL, { // For Local Database
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
-  .then((con) => {
-    // console.log(con.connections);
-    console.log('DB connection succesful!');
-  });
+  .connect(DB, {})
+
+  .then(() => console.log('DB connection successful!'))
+  .catch((err) => console.error('DB connection error:', err));
 
 const tourSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: [true, 'A tour must have a name'],
+    required: [true, 'A tour must have a name!'],
+    unique: true,
   },
   rating: {
     type: Number,
@@ -33,12 +28,25 @@ const tourSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
-    required: true,
+    required: [true, 'A tour must have a price!'],
   },
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
 
+const testTour = new Tour({
+  name: 'The Park Camper',
+  price: 997,
+});
+
+testTour
+  .save()
+  .then((doc) => {
+    console.log(doc);
+  })
+  .catch((err) => {
+    console.log('ERROR 💥', err);
+  });
 // console.log(process.env);
 
 // 4| Server
