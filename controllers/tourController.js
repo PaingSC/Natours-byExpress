@@ -1,26 +1,40 @@
-const Tour = require('./../models/tourModel');
+const Tour = require('../models/tourModel');
 
 // Get all Tours (get request)
-exports.getAllTours = (req, res) => {
-  console.log(req.requestTime);
-  res.status(200).json({
-    status: 'success',
-    requestedAt: req.requestTime,
-    // results: tours.length,
-    // tours,
-  });
+exports.getAllTours = async (req, res) => {
+  try {
+    const tours = await Tour.find();
+    res.status(200).json({
+      status: 'success',
+      results: tours.length,
+      data: {
+        tours,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 // Get a Tour (Responding to Url parameters(/:variables))
-exports.getATour = (req, res) => {
-  const tourId = req.params.id * 1; // Making it into a number
+exports.getATour = async (req, res) => {
+  try {
+    // Tour.findOne({ _id: req.params.id})
+    const tour = await Tour.findById(req.params.id);
 
-  // const tour = tours.find((tour) => tour.id === tourId);
-
-  // res.status(200).json({
-  //   status: 'success',
-  //   tour,
-  // });
+    res.status(200).json({
+      status: 'success',
+      tour,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
 };
 
 // Updating a tour (patch request)
@@ -42,7 +56,7 @@ exports.deleteTour = (req, res) => {
 };
 
 exports.createTour = async (req, res) => {
-  // const newTour = new Tour({})
+  // const newTour = newTour({})
   // newTour.save();
   try {
     const newTour = await Tour.create(req.body);
