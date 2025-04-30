@@ -16,12 +16,13 @@ exports.getAllTours = async (req, res) => {
 
     // { difficylty: 'easy', duration: { $gte: 5 }}
     // { difficulty: 'easy', duration: { gte: '5' } }
+    // { difficulty: 'easy', duration: { '$gte': '5' } }
     // gte, gt, lte, lt
 
     console.log(req.query, queryObj, JSON.parse(queryStr), req.params);
 
     // EXECUTE QUERY
-    const query = Tour.find({ difficylty: 'easy', duration: { $gte: 5 } });
+    const query = Tour.find(JSON.parse(queryStr));
     // const query = Tour.find(queryObj);
     // const query = Tour.find(JSON.parse(queryStr));
 
