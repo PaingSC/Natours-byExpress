@@ -32,7 +32,8 @@ exports.getAllTours = async (req, res) => {
       query = query.sort(sortBy);
       // sort("price ratingsAverage")
     } else {
-      query = query.sort('-createdAt');
+      // query = query.sort('-createdAt');
+      query = query.sort('name');
     }
 
     // III) Limiting Fields
@@ -46,6 +47,24 @@ exports.getAllTours = async (req, res) => {
       query = query.select('-__v');
     }
 
+    // IV) Pagination
+    // page1&limit=3
+    // Example pagination => page=2&limit=10
+    // 1-10 docs for page1, 11-20 docs for page2, 21-30 docs for page3 and so on...
+    // use skip() and limit() methods
+    // example => query = query.skip(10).limit(10) for "page=2&limit=10"
+
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) throw new Error('This page does not exit');
+    }
+
     // console.log(query);
     // const query = Tour.find(queryObj);
     // const query = Tour.find(JSON.parse(queryStr));
@@ -56,6 +75,7 @@ exports.getAllTours = async (req, res) => {
     //   .where('difficulty')
     //   .equals('easy');
 
+    // query = query.sort().select().skip().limit()
     const tours = await query;
     // console.log(tours);
 
