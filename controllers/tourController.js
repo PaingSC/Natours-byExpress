@@ -34,6 +34,18 @@ exports.getAllTours = async (req, res) => {
     } else {
       query = query.sort('-createdAt');
     }
+
+    // III) Limiting Fields
+    // Example fields -> name, duration, difficulty, price
+    // expected query string =>
+    // query = query.select('name duration, difficulty, price)
+    if (req.query.fields) {
+      const fields = req.query.fields.split('%').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+
     // console.log(query);
     // const query = Tour.find(queryObj);
     // const query = Tour.find(JSON.parse(queryStr));
