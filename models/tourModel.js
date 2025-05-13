@@ -55,6 +55,10 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -88,6 +92,27 @@ tourSchema.pre('save', function (next) {
 //   console.log(doc);
 //   next();
 // });
+// ⚠️⚠️⚠️ In the regular callback functions of pre and post "saveHooks",
+// (document middleware) "this" keyword is the current document itself. ⚠️⚠️⚠️
+
+// Query Middleware
+// tourSchema.pre('find', function (next) {
+tourSchema.pre(/^find/, function (next) {
+  // console.log(this);
+  this.find({ secretTour: { $ne: true } });
+
+  this.start = Date.now();
+  next();
+});
+
+tourSchema.post(/^find/, function (docs, next) {
+  console.log(`Querry took ${Date.now() - this.start} milliseconds.`);
+  console.log(docs);
+  next();
+});
+
+// ⚠️⚠️⚠️ In the regular callback functions of pre and post "findHooks"
+// (Query Middleware),"this" keyword is the the current query object . ⚠️⚠️⚠️
 
 const Tour = mongoose.model('Tour', tourSchema);
 
