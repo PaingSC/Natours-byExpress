@@ -19,9 +19,11 @@ exports.getAllTours = async (req, res) => {
     const queryObj = { ...req.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach((el) => delete queryObj[el]);
+    // console.log('QueryObj', queryObj);
 
     // IB) Advance Filtering
     let queryStr = JSON.stringify(queryObj);
+    // console.log('queryStr', queryStr);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     // console.log(JSON.parse(queryStr));
 

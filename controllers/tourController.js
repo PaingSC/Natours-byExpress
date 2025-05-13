@@ -111,3 +111,49 @@ exports.createTour = async (req, res) => {
     });
   }
 };
+
+// Status of tours those having rating average of { $gte: 4.8 }
+exports.getTourStats = async (req, res) => {
+  try {
+    const stats = await Tour.aggregate([
+      {
+        $match: {
+          ratingsAverage: { $gte: 4.5 },
+          // difficulty: 'easy',
+          // price: { $gte: 500 },
+        },
+      },
+      {
+        $group: {
+          _id: { $toUpper: '$difficulty' },
+          // _id: '$difficulty',
+          numTours: { $sum: 1 },
+          numRating: { $sum: '$ratingsQuantity' },
+          avgRating: { $avg: '$ratingsAverage' },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+        },
+      },
+      {
+        $sort: { _id: 1 },
+      },
+      // {
+      //   // $match: { _id: 'EASY' },
+      //   $match: { _id: { $ne: 'EASY' } },
+      // },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      length: stats.length,
+      data: {
+        stats,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'failed',
+      message: err,
+    });
+  }
+};
