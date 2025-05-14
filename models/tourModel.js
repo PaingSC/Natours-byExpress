@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -10,6 +11,7 @@ const tourSchema = new mongoose.Schema(
       trim: true,
       maxlength: [60, 'A tour name must have less or equal then 60 characters'],
       minlength: [10, 'A tour name must have equal or more then 10 characters'],
+      // validate: [validator.isAlpha, 'Tour name must only contain characters'],
     },
     slug: String,
     duration: {
@@ -30,9 +32,9 @@ const tourSchema = new mongoose.Schema(
     },
     ratingsAverage: {
       type: Number,
-      default: 4.5,
       min: [1, 'Rating must be above 1.0'],
-      max: [1, 'Rating must be below 5.0'],
+      max: [5, 'Rating must be below 5.0'],
+      default: 4.5,
     },
     ratingsQuantity: {
       type: Number,
@@ -42,7 +44,18 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'A tour must have a price!'],
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        validator: function (val) {
+          // the "this" keyword here is the current doc on creating phase
+          // not going to work on updating the doc
+          // the function parameter(val) is the enter amount of "priceDiscount"
+          return val < this.price;
+        },
+        message: 'Discount price ({VALUE}) should below the regular price!',
+      },
+    },
     summary: {
       type: String,
       trim: true,
