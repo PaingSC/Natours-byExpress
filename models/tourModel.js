@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
+// const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -81,6 +81,10 @@ const tourSchema = new mongoose.Schema(
       default: false,
     },
   },
+  // {
+  //   toJSON: { virtuals: true },
+  //   toObject: { virtuals: true },
+  // },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
@@ -105,6 +109,11 @@ tourSchema.pre('save', function (next) {
 
 // tourSchema.pre('save', function (next) {
 //   console.log('Will save document...');
+//   next();
+// });
+
+// tourSchema.pre('save', function (next) {
+//   console.log(this);
 //   next();
 // });
 
@@ -136,8 +145,9 @@ tourSchema.post(/^find/, function (docs, next) {
 
 // Aggregation Middleware
 tourSchema.pre('aggregate', function (next) {
+  // console.log(this);
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  console.log(this.pipeline());
+  // console.log(this.pipeline());
   next();
 });
 
