@@ -3,8 +3,13 @@
 const AppError = require('../utils/appError');
 
 const handleCastErrorDB = (err) => {
-  console.log('Hello grom handleCastError function!');
   const message = `Invalid ${err.path}: ${err.value}`;
+  return new AppError(message, 400);
+};
+
+const handleDuplicateFieldsDB = (err) => {
+  const { name } = err.keyValue;
+  const message = `Duplicate field value: "${name}". Please use another value`;
   return new AppError(message, 400);
 };
 
@@ -59,6 +64,7 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {
     if (err.name === 'CastError') err = handleCastErrorDB(err);
+    if (err.code === 11000) err = handleDuplicateFieldsDB(err);
 
     sendErrorProd(err, res);
   }
