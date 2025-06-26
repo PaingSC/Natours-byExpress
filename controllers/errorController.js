@@ -2,14 +2,27 @@
 
 const AppError = require('../utils/appError');
 
+// Error Handlers
+// I) name: CastError
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path}: ${err.value}`;
   return new AppError(message, 400);
 };
 
+// II) code: 11000
 const handleDuplicateFieldsDB = (err) => {
   const { name } = err.keyValue;
   const message = `Duplicate field value: "${name}". Please use another value`;
+  return new AppError(message, 400);
+};
+
+// III) name: ValitionError
+const handleValitionErrorDB = (err) => {
+  const errorMessages = Object.values(err.errors)
+    .map((error) => error.message)
+    .join('. ');
+
+  const message = `Invalid input data. ${errorMessages}`;
   return new AppError(message, 400);
 };
 
@@ -20,6 +33,7 @@ const sendErrorDev = (err, res) => {
     error: err,
     message: err.message,
     stack: err.stack,
+    isOperational: false,
   });
 };
 
@@ -36,6 +50,7 @@ const sendErrorProd = (err, res) => {
     res.status(err.statusCode).json({
       status: err.status,
       message: err.message,
+      isOperational: err.isOperational,
     });
 
     // Programming or other unknown error: don't leak error details
@@ -46,9 +61,10 @@ const sendErrorProd = (err, res) => {
     // 2) Send generic message
     res.status(500).json({
       status: err.status,
-      error: err,
+      // error: err,
       message: err.message,
-      stack: err.stack,
+      // stack: err.stack,
+      isOperational: err.isOperational,
     });
   }
 };
@@ -65,6 +81,7 @@ module.exports = (err, req, res, next) => {
   } else if (process.env.NODE_ENV === 'production') {
     if (err.name === 'CastError') err = handleCastErrorDB(err);
     if (err.code === 11000) err = handleDuplicateFieldsDB(err);
+    if (err.name === 'ValidationError') err = handleValitionErrorDB(err);
 
     sendErrorProd(err, res);
   }
