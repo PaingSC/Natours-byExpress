@@ -1,22 +1,18 @@
 const User = require('../models/userModel');
+const catchAsync = require('../utils/catchAsync');
 
 // User Route Handlers
-exports.getAllUsers = async (req, res, next) => {
-  try {
-    const users = await User.find();
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await User.find();
 
-    res.status('200').json({
-      status: 'success',
-      numberOfUsers: users.length,
+  res.status('200').json({
+    status: 'success',
+    numberOfUsers: users.length,
+    data: {
       users,
-    });
-  } catch {
-    res.status('500').json({
-      status: 'error',
-      message: 'This route is not yet defined!',
-    });
-  }
-};
+    },
+  });
+});
 
 exports.createUser = (req, res, next) => {
   res.status('500').json({
