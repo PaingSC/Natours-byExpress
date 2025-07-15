@@ -17,6 +17,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     name: req.body.name,
     email: req.body.email,
     password: req.body.password,
+    role: req.body.role,
     passwordConfirm: req.body.passwordConfirm,
     ...(req.body.passwordChangeAt && {
       passwordChangeAt: req.body.passwordChangeAt,
@@ -69,6 +70,7 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
+  // console.log(req.headers.authorization);
   // 1) Getting token and check of it's there
   let token;
   if (
@@ -89,8 +91,8 @@ exports.protect = catchAsync(async (req, res, next) => {
   // console.log('Decoded:', decoded);
 
   // 3) Check if user still exists
-  const freshUser = await User.findById(decoded.id);
-  if (!freshUser) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(
       new AppError(
         'The token belonging to this user does no longer exist.',
@@ -100,13 +102,26 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
 
   // 4) Check if user changed password after the JWT(token) was issued
-  if (freshUser.changePasswordAfter(decoded.iat)) {
+  if (currentUser.changePasswordAfter(decoded.iat)) {
     return next(
       new AppError('User recently changed password! Please log in again.', 401),
     );
   }
 
   // GRANT ACCESS TO PROTECTED ROUTE
-  req.user = freshUser;
+  req.user = currentUser;
   next();
 });
+
+// restrictTo Middleware
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You don't have permission to perform this action!", 403),
+      );
+    }
+
+    next();
+  };
