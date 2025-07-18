@@ -62,6 +62,12 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) next();
+  this.passwordChangeAt = Date.now();
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
@@ -85,10 +91,10 @@ userSchema.methods.changePasswordAfter = function (JWTTimestamp) {
     // console.log(changedTimestamp, JWTTimestamp);
 
     return JWTTimestamp < changedTimestamp;
-    // 100 < 200
+    // 100 < 200 (return true => return error)
   }
 
-  return false;
+  return false; // means not changed the password after the token was issued
 };
 
 // createPasswordResetToken: instance method
