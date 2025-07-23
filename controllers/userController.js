@@ -2,14 +2,21 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-const filterObj = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) newObj[el] = obj[el];
-  });
-  return newObj;
-  console.log(newObj);
-};
+// const filterObj = (obj, ...allowedFields) => {
+//   const newObj = {};
+//   Object.keys(obj).forEach((el) => {
+//     if (allowedFields.includes(el)) newObj[el] = obj[el];
+//   });
+
+//   return newObj;
+// };
+
+const filterObj = (obj, ...allowedFields) =>
+  Object.keys(obj).reduce((acc, key) => {
+    if (allowedFields.includes(key)) acc[key] = obj[key];
+
+    return acc;
+  }, {});
 
 // User Route Handlers
 exports.getAllUsers = catchAsync(async (req, res, next) => {
@@ -29,7 +36,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
-        'This rout is not for password update. Please use /updateMyPassword',
+        'This route is not for password update. Please use /updateMyPassword',
         400,
       ),
     );
@@ -37,20 +44,29 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // 2) Filtered out unwanted fields that are not allowed to be updated!
   const filterBody = filterObj(req.body, 'name', 'email');
+  // result filterBody = {name: "New User Name", email: "new@something.com"}
 
   // 2) Update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filterBody, {
     new: true,
     runValidators: true,
   });
-  // user.name = 'Paing';
-  // await user.save();
 
   res.status(200).json({
     status: 'success',
     data: {
       user: updatedUser,
     },
+  });
+});
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(204).json({
+    status: 'success',
+    message: 'successful',
+    data: null,
   });
 });
 
