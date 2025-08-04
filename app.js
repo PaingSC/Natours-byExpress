@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 // const { dirname } = require('path');
 
 const tourRouter = require('./routes/tourRoutes');
@@ -11,6 +12,10 @@ const globalErrorHandler = require('./controllers/errorController');
 const app = express();
 
 // 1| Global Middlewares
+// 1. Set security HTTP headers
+app.use(helmet());
+
+// 2. Development logging
 // if (process.env.NODE_ENV === 'development') {
 //   app.use(morgan('dev'));
 //   console.log(process.env.NODE_ENV);
@@ -20,6 +25,7 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// 3. Limit requests from the same API
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -27,15 +33,23 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-app.use(express.json());
+// 4. Body parser, reading data from the body into req.body
+app.use(
+  express.json({
+    limit: '10kb',
+  }),
+);
+
+// 5. Serving static files
 app.use(express.static(`${__dirname}/public`));
 
-// Own middleware
+// 2| Own middlewares
 // app.use((req, res, next) => {
 //   console.log('Hello from the middle ware! 👋');
 //   next();
 // });
 
+// 2.1. Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
   // console.log(req.requestTime);
