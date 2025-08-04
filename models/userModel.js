@@ -41,6 +41,11 @@ const userSchema = new mongoose.Schema({
       message: 'Passwords are not the same!',
     },
   },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+    immutable: true,
+  },
   passwordChangeAt: {
     type: Date,
     // required: [true, 'This field needed now!'],
@@ -68,8 +73,15 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.pre('save', function (next) {
-  if (!this.isModified('password') || this.isNew) next();
+  if (!this.isModified('password') || this.isNew) {
+    console.log('This is new doc. No password change tiemstamp!');
+    return next();
+  }
   this.passwordChangeAt = Date.now();
+  console.log(
+    'This is chainging the password of a doc. There is password chande tiemstamp!',
+  );
+
   next();
 });
 

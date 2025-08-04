@@ -1,5 +1,6 @@
 const express = require('express');
 const morgan = require('morgan');
+// const rateLimit = require('express-rate-limit');
 // const { dirname } = require('path');
 
 const tourRouter = require('./routes/tourRoutes');
@@ -9,7 +10,7 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
-// 1| Middlewares
+// 1| Global Middlewares
 // if (process.env.NODE_ENV === 'development') {
 //   app.use(morgan('dev'));
 //   console.log(process.env.NODE_ENV);
