@@ -146,7 +146,7 @@ tourSchema.pre('save', function (next) {
 //   this.guides = await Promise.all(guidesPromises);
 //   console.log(this.guides);
 
-//   return next();
+//    next();
 // });
 
 // tourSchema.pre('save', function (next) {
@@ -177,6 +177,16 @@ tourSchema.pre(/^find/, function (next) {
   next();
 });
 
+// Populate(fill up) "guides" field in query but not in actual database
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangeAt',
+  });
+
+  next();
+});
+
 tourSchema.post(/^find/, function (docs, next) {
   console.log(`Querry took ${Date.now() - this.start} milliseconds.`);
   // console.log(docs);
@@ -184,6 +194,8 @@ tourSchema.post(/^find/, function (docs, next) {
 });
 // ⚠️⚠️⚠️ In the regular callback functions of pre and post "findHooks"
 // (Query Middleware),"this" keyword is the the current query object . ⚠️⚠️⚠️
+
+//
 
 // Aggregation Middleware
 tourSchema.pre('aggregate', function (next) {
