@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+const User = require('./userModel');
 // const validator = require('validator');
 
 const tourSchema = new mongoose.Schema(
@@ -109,6 +110,7 @@ const tourSchema = new mongoose.Schema(
         day: Number,
       },
     ],
+    guides: Array,
   },
   {
     toJSON: { virtuals: true },
@@ -130,6 +132,16 @@ tourSchema.pre('save', function (next) {
   // console.log(this);
   this.slug = slugify(this.name, { lower: true });
   next();
+});
+
+// Inserting embbeding users(guides) in the field of guides in tour model
+tourSchema.pre('save', async function (next) {
+  const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+  console.log(guidesPromises);
+  this.guides = await Promise.all(guidesPromises);
+  console.log(this.guides);
+
+  return next();
 });
 
 // tourSchema.pre('save', function (next) {
@@ -179,3 +191,30 @@ tourSchema.pre('aggregate', function (next) {
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;
+
+// const tripSchema = new mongoose.Schema({
+//   startLocation: {
+//     // GeoJSON in order to specify geospectial data
+//     type: {
+//       type: String,
+//       default: 'Point',
+//       enum: ['Point'],
+//     },
+//     coordinates: [Number],
+//     address: String,
+//     description: String,
+//   },
+//   locations: [
+//     {
+//       type: {
+//         type: String,
+//         default: 'Point',
+//         enum: ['Point'],
+//       },
+//       coordinates: [Number],
+//       address: String,
+//       description: String,
+//       day: Number,
+//     },
+//   ],
+// });
