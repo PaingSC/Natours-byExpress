@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const slugify = require('slugify');
 // const User = require('./userModel');
 // const validator = require('validator');
+const Review = require('./revewModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -116,6 +117,12 @@ const tourSchema = new mongoose.Schema(
         ref: 'User',
       },
     ],
+    // reviews: [
+    //   {
+    //     type: mongoose.Schema.ObjectId,
+    //     ref: 'Review',
+    //   },
+    // ],
   },
   {
     toJSON: { virtuals: true },
@@ -128,8 +135,16 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
-tourSchema.virtual('nameUppercase').get(function () {
-  return this.name.toUpperCase();
+// Chainging Name to uppercase letter
+// tourSchema.virtual('nameUppercase').get(function () {
+//   return this.name.toUpperCase();
+// });
+
+// Virtual Populating
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
 });
 
 // Document Middleware(preHook): runs before .save() and .create()
