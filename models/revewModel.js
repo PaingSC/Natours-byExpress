@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const Tour = require('./tourModel');
-const User = require('./tourModel');
+// const Tour = require('./tourModel');
+// const User = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema(
   {
@@ -33,6 +33,26 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+// Populating
+// reviewSchema.pre(/^find/, function (next) {
+//   this.populate({
+//     path: ['tour', 'user'],
+//     select: 'name photo',
+//   });
+//   next();
+// });
+
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'tour',
+    select: 'name ',
+  }).populate({
+    path: 'user',
+    select: 'name photo',
+  });
+  next();
+});
 
 const Review = mongoose.model('Review', reviewSchema);
 
