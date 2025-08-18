@@ -17,6 +17,10 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
 });
 
 exports.createAReview = catchAsync(async (req, res, next) => {
+  // Allowing nested routes
+  if (!req.body.tour) req.body.tour = req.params.tourId;
+  if (!req.body.user) req.body.user = req.user.id;
+
   const review = await Review.create(req.body);
 
   if (!review) return next(new AppError('The request body is empty!'));
