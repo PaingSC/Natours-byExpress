@@ -82,7 +82,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// 3 |Routes
+// 3 |Routes (Mounting routes)
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
