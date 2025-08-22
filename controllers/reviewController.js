@@ -1,13 +1,14 @@
 const Review = require('../models/revewModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
   let filter = {};
   if (req.params.tourId) {
     filter = { tour: req.params.tourId };
   }
-  console.log(filter);
+
   const reviews = await Review.find(filter);
 
   if (!reviews) return next(new AppError('No review found with this link'));
@@ -21,6 +22,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
+// Creating a Review
 exports.createAReview = catchAsync(async (req, res, next) => {
   // Allowing nested routes
   if (!req.body.tour) req.body.tour = req.params.tourId;
@@ -37,3 +39,6 @@ exports.createAReview = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// Deleting a Review
+exports.deleteAReview = factory.deleteOne(Review);

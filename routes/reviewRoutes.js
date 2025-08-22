@@ -13,4 +13,12 @@ router
     reviewController.createAReview,
   );
 
+router
+  .route('/:id')
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    reviewController.deleteAReview,
+  );
+
 module.exports = router;
