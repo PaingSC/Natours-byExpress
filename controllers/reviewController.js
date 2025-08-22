@@ -3,7 +3,12 @@ const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
 exports.getAllReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find();
+  let filter = {};
+  if (req.params.tourId) {
+    filter = { tour: req.params.tourId };
+  }
+  console.log(filter);
+  const reviews = await Review.find(filter);
 
   if (!reviews) return next(new AppError('No review found with this link'));
 
