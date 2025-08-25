@@ -45,9 +45,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
   // 2) Filtered out unwanted fields that are not allowed to be updated!
   const filterBody = filterObj(req.body, 'name', 'email');
-  // result filterBody = {name: "New User Name", email: "new@something.com"}
+  // result => filterBody = {name: "New User Name", email: "new@something.com"}
 
-  // 2) Update user document
+  // 3) Update user document
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filterBody, {
     new: true,
     runValidators: true,
@@ -85,12 +85,8 @@ exports.getUser = (req, res, next) => {
   });
 };
 
-exports.updateUser = (req, res, next) => {
-  res.status('500').json({
-    status: 'error',
-    message: 'This route is not yet defined!',
-  });
-};
+// 🔥🔥🔥 Do not attempt to update passwords with this!
+exports.updateUser = factory.updateOne(User);
 
 // Deleting a User
 // exports.deleteUser = (req, res, next) => {

@@ -23,22 +23,33 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
 });
 
 // Creating a Review
-exports.createAReview = catchAsync(async (req, res, next) => {
+exports.setTourUserIds = (req, res, next) => {
   // Allowing nested routes
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.body.user) req.body.user = req.user.id;
+  next();
+};
 
-  const review = await Review.create(req.body);
+exports.createAReview = factory.createOne(Review);
+// exports.createAReview = catchAsync(async (req, res, next) => {
+//   // Allowing nested routes
+//   if (!req.body.tour) req.body.tour = req.params.tourId;
+//   if (!req.body.user) req.body.user = req.user.id;
 
-  if (!review) return next(new AppError('The request body is empty!'));
+//   const review = await Review.create(req.body);
 
-  res.status('201').json({
-    status: 'success',
-    data: {
-      review,
-    },
-  });
-});
+//   if (!review) return next(new AppError('The request body is empty!'));
+
+//   res.status('201').json({
+//     status: 'success',
+//     data: {
+//       review,
+//     },
+//   });
+// });
+
+// Update one Review
+exports.updateAReview = factory.updateOne(Review);
 
 // Deleting a Review
 exports.deleteAReview = factory.deleteOne(Review);

@@ -10,11 +10,17 @@ router
   .post(
     authController.protect,
     authController.restrictTo('user'),
+    reviewController.setTourUserIds,
     reviewController.createAReview,
   );
 
 router
   .route('/:id')
+  .patch(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    reviewController.updateAReview,
+  )
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
