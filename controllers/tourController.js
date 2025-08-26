@@ -1,6 +1,6 @@
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
-const AppError = require('../utils/appError');
+// const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
@@ -13,40 +13,46 @@ exports.aliasTopTours = (req, res, next) => {
 };
 
 // Get all Tours (get request)
-exports.getAllTours = catchAsync(async (req, res, next) => {
-  // EXECUTE QUERY
-  const features = new APIFeatures(Tour.find(), req.query)
-    .filter()
-    .sort()
-    .limitFields()
-    .paginate();
-  // console.log(features);
-  const tours = await features.query;
 
-  // SEND RESPONSE
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours,
-    },
-  });
-});
+exports.getAllTours = factory.getAll(Tour);
+
+// exports.getAllTours = catchAsync(async (req, res, next) => {
+//   // EXECUTE QUERY
+//   const features = new APIFeatures(Tour.find(), req.query)
+//     .filter()
+//     .sort()
+//     .limitFields()
+//     .paginate();
+//   // console.log(features);
+//   const tours = await features.query;
+
+//   // SEND RESPONSE
+//   res.status(200).json({
+//     status: 'success',
+//     results: tours.length,
+//     data: {
+//       tours,
+//     },
+//   });
+// });
 
 // Get a Tour (Responding to Url parameters(/:variables))
-exports.getATour = catchAsync(async (req, res, next) => {
-  // Tour.findOne({ _id: req.params.id})
-  const tour = await Tour.findById(req.params.id).populate('reviews');
 
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
-  }
+exports.getATour = factory.getOne(Tour, { path: 'reviews' });
 
-  res.status(200).json({
-    status: 'success',
-    tour,
-  });
-});
+// exports.getATour = catchAsync(async (req, res, next) => {
+//   // Tour.findOne({ _id: req.params.id})
+//   const tour = await Tour.findById(req.params.id).populate('reviews');
+
+//   if (!tour) {
+//     return next(new AppError('No tour found with that ID', 404));
+//   }
+
+//   res.status(200).json({
+//     status: 'success',
+//     tour,
+//   });
+// });
 
 // Updating a tour (patch request)
 exports.updateTour = factory.updateOne(Tour);

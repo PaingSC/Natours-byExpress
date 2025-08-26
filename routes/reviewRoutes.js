@@ -16,6 +16,7 @@ router
 
 router
   .route('/:id')
+  .get(reviewController.getAReview)
   .patch(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),

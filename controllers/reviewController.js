@@ -1,26 +1,30 @@
 const Review = require('../models/revewModel');
-const AppError = require('../utils/appError');
-const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 
-exports.getAllReviews = catchAsync(async (req, res, next) => {
-  let filter = {};
-  if (req.params.tourId) {
-    filter = { tour: req.params.tourId };
-  }
+// Get All Reviews
+exports.getAllReviews = factory.getAll(Review);
 
-  const reviews = await Review.find(filter);
+// exports.getAllReviews = catchAsync(async (req, res, next) => {
+//   let filter = {};
+//   if (req.params.tourId) {
+//     filter = { tour: req.params.tourId };
+//   }
 
-  if (!reviews) return next(new AppError('No review found with this link'));
+//   const reviews = await Review.find(filter);
 
-  res.status(200).json({
-    status: 'success',
-    results: reviews.length,
-    data: {
-      reviews,
-    },
-  });
-});
+//   if (!reviews) return next(new AppError('No review found with this link'));
+
+//   res.status(200).json({
+//     status: 'success',
+//     results: reviews.length,
+//     data: {
+//       reviews,
+//     },
+//   });
+// });
+
+// Get A review
+exports.getAReview = factory.getOne(Review);
 
 // Creating a Review
 exports.setTourUserIds = (req, res, next) => {
