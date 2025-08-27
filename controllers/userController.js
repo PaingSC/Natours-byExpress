@@ -103,3 +103,9 @@ exports.updateUser = factory.updateOne(User);
 // };
 
 exports.deleteAUser = factory.deleteOne(User);
+
+// Middleware for getting current user
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};
