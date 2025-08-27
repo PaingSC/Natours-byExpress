@@ -77,7 +77,7 @@ userSchema.pre('save', function (next) {
     console.log('This is new doc. No password change tiemstamp!');
     return next();
   }
-  this.passwordChangeAt = Date.now();
+  this.passwordChangeAt = Date.now() - 1000;
   console.log(
     'This is chainging the password of a doc. There is password chande tiemstamp!',
   );

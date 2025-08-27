@@ -1,4 +1,4 @@
-const Review = require('../models/revewModel');
+const Review = require('../models/reviewModel');
 const factory = require('./handlerFactory');
 
 // Get All Reviews
