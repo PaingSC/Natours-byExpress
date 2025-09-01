@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-// const Tour = require('./tourModel');
+const Tour = require('./tourModel');
 // const User = require('./tourModel');
 
 const reviewSchema = new mongoose.Schema(
@@ -8,7 +8,7 @@ const reviewSchema = new mongoose.Schema(
       type: String,
       required: [true, 'Review cannot be empty'],
     },
-    ratting: {
+    rating: {
       type: Number,
       min: 1,
       max: 5,
@@ -58,6 +58,40 @@ reviewSchema.pre(/^find/, function (next) {
     select: 'name photo',
   });
   next();
+});
+
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  // "this" keyword represents the current Model
+  // In this case "this" = "Review" Moelw
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+
+  // console.log(stats);
+
+  // Saving the statistics to the specific(current) tour
+  await Tour.findByIdAndUpdate(tourId, {
+    ratingsQuantity: stats[0].nRating,
+    ratingsAverage: stats[0].avgRating,
+  });
+};
+
+// Call the statics method after the new review is created!
+// In this case post for after saving
+reviewSchema.post('save', function () {
+  // This points to current review document
+  // "constructor" is the Model who created that document
+  this.constructor.calcAverageRatings(this.tour);
+  // next();
 });
 
 const Review = mongoose.model('Review', reviewSchema);

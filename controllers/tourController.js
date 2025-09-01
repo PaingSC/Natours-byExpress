@@ -99,7 +99,7 @@ exports.getTourStats = catchAsync(async (req, res, next) => {
       },
     },
     {
-      $sort: { _id: 1 },
+      $sort: { _id: -1 },
     },
     // {
     //   // $match: { _id: 'EASY' },
